@@ -298,3 +298,24 @@ unique(wolfkde_noCOV$pack)
 #Save data
 write.table(wolfkde_noCOV, file = "wolfkde_noCOV.csv", row.names = FALSE, 
             col.names = TRUE, sep = ",")
+
+
+##------------------------------------------------------------------------------
+### PERSON 2:
+
+
+
+## Working on wolfkde_noCOV:
+
+
+
+## 1.Convert use to factor
+
+
+
+wolfkde_noCOV$usedfactor<-as.factor(wolfkde_noCOV$used)
+
+
+
+## 2. and add some columns for the covariates (at the end of the lab 2 and beginning of lab 3, in several steps) (covariates that person 2 will have ready)
+
