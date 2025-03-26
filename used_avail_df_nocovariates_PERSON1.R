@@ -113,7 +113,16 @@ image(hr95)
 ##BOW VALLEY ANALYSIS-----------------------------------------------------------
 
 #create bv data frames
+#first convert the spatialpointsdataframe to spatial points object
+bv.data<-wolfyht[wolfyht$Pack=="Bow valley",]
+x<-bv.data$EASTING
+y<-bv.data$NORTHING
+xy<-cbind(x,y)
 
+bv <- data.frame(as.character(bv.data$NAME))
+coordinates(bv) <- xy
+crs(bv) <-  "+proj=utm +zone=11 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"
+names(bv)<-"NAME"
 
 graphics.off()
 #calculate 99% KDE for Bow Valley wolf pack
@@ -159,6 +168,17 @@ image(hr95)
 
 
 ##BOTH WOLF PACKS---------------------------------------------------------------
+
+#Prepare data for both species together ('all')
+#first convert the spatialpointsdataframe to spatial points object
+x<-wolfyht$EASTING
+y<-wolfyht$NORTHING
+xy<-cbind(x,y)
+
+all <- data.frame(as.character(wolfyht$Pack))
+coordinates(all) <- xy
+crs(all) <-  "+proj=utm +zone=11 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"
+
 
 #calculate 99% KDE for both wolf packs
 allUD <- kernelUD(all, grid=30, extent=0.5, same4all=TRUE) # reference grid
@@ -226,9 +246,14 @@ rdused_noCOV$pack <- c("Red Deer")
 bvused_noCOV <- bv
 bvused_noCOV$pack <- c("Bow Valley")
 
-wolfused_noCOV <- merge(rdused_noCOV, bvused_noCOV, all.x = TRUE, all.y = TRUE)
+
+wolfused_noCOV <- rbind(bvused_noCOV, rdused_noCOV)
 str(wolfused_noCOV)
 
+unique(wolfused_noCOV$pack)
+
+
+unique(wolfused_noCOV$NAME)
 
 head(wolfused_noCOV)
 
@@ -249,15 +274,27 @@ bvavail$pack <- c("Bow Valley")
 ## merge the two availability samples together
 wolfavail_noCOV <- rbind(rdavail, bvavail)
 
+unique(wolfused_noCOV$pack)
+
+
 ## and for next week, lets add a new column for a 1=used 0 = avail
 wolfavail_noCOV$used <- 0
 
 ##combine df's for used and available 
-wolfkde_noCOV <- rbind(wolfused_noCOV, wolfavail_noCOV)
+
+#convert wolf used spatialpointsdataframe to dataframe
+wolfused_noCOV_df <- as.data.frame(wolfused_noCOV)
+wolfused_noCOV_df$NAME <- NULL
+head(wolfused_noCOV_df)
+
+wolfkde_noCOV <- rbind(wolfused_noCOV_df, wolfavail_noCOV)
 str(wolfkde_noCOV)
   
+head(wolfkde_noCOV)
 
+unique(wolfkde_noCOV$pack)  
   
   
-  
-  
+#Save data
+write.table(wolfkde_noCOV, file = "wolfkde_noCOV.csv", row.names = FALSE, 
+            col.names = TRUE, sep = ",")
